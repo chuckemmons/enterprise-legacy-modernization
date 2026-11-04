@@ -1,0 +1,9 @@
+/build/
+/dist/
+/lib/
+/tools/*.jar
+*.log
+.idea/
+*.iml
+.DS_Store
+build.properties

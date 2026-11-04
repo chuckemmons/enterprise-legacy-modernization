@@ -1,0 +1,85 @@
+<project name="legacy-enterprise-case-management" default="ear" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property environment="env"/>
+    <property file="build.properties"/>
+    <property name="src" location="src/main/java"/>
+    <property name="classes" location="build/classes"/>
+    <property name="lib" location="lib"/>
+    <property name="provided" location="build/provided"/>
+    <property name="dist" location="dist"/>
+    <property name="ivy.jar" location="tools/ivy-2.5.3.jar"/>
+
+    <target name="init">
+        <mkdir dir="${classes}"/><mkdir dir="${lib}"/>
+        <mkdir dir="${provided}"/><mkdir dir="${dist}"/><mkdir dir="tools"/>
+        <available file="${ivy.jar}" property="ivy.present"/>
+    </target>
+    <target name="bootstrap-ivy" depends="init" unless="ivy.present">
+        <get src="https://repo.maven.apache.org/maven2/org/apache/ivy/ivy/2.5.3/ivy-2.5.3.jar"
+             dest="${ivy.jar}" usetimestamp="true" verbose="true"/>
+    </target>
+    <target name="resolve" depends="bootstrap-ivy">
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar}"/>
+        <ivy:settings file="ivysettings.xml"/>
+        <ivy:resolve file="ivy.xml" conf="runtime,provided"/>
+        <ivy:retrieve conf="runtime" pattern="${lib}/[artifact]-[revision](-[classifier]).[ext]" sync="true"/>
+        <ivy:retrieve conf="provided" pattern="${provided}/[artifact]-[revision](-[classifier]).[ext]" sync="true"/>
+    </target>
+    <path id="compile.path">
+        <fileset dir="${lib}" includes="*.jar" erroronmissingdir="false"/>
+        <fileset dir="${provided}" includes="*.jar" erroronmissingdir="false"/>
+        <pathelement location="${classes}"/>
+    </path>
+    <target name="compile" depends="resolve">
+        <javac srcdir="${src}" destdir="${classes}" source="1.8" target="1.8" encoding="UTF-8"
+               includeantruntime="false" debug="true" failonerror="true">
+            <classpath refid="compile.path"/>
+        </javac>
+        <copy todir="${classes}"><fileset dir="src/main/resources"/></copy>
+    </target>
+    <target name="war" depends="compile">
+        <war destfile="${dist}/legacy-case-management.war" webxml="src/main/webapp/WEB-INF/web.xml" duplicate="fail">
+            <fileset dir="src/main/webapp" excludes="WEB-INF/web.xml"/>
+            <classes dir="${classes}"/>
+            <lib dir="${lib}" includes="*.jar"/>
+        </war>
+    </target>
+    <!-- A portable Java EE 6 EAR containing an ordinary WAR; no EJB server features. -->
+    <target name="ear" depends="war">
+        <ear destfile="${dist}/legacy-case-management.ear"
+             appxml="src/main/application/META-INF/application.xml" duplicate="fail">
+            <fileset dir="${dist}" includes="legacy-case-management.war"/>
+        </ear>
+    </target>
+    <target name="job-overdue" depends="compile">
+        <java classname="com.example.legacy.bootstrap.RunJobs" fork="true" failonerror="true">
+            <arg value="overdue"/><classpath refid="compile.path"/>
+        </java>
+    </target>
+    <target name="job-email" depends="compile">
+        <java classname="com.example.legacy.bootstrap.RunJobs" fork="true" failonerror="true">
+            <arg value="email"/><classpath refid="compile.path"/>
+        </java>
+    </target>
+    <target name="seed-admin" depends="compile">
+        <java classname="com.example.legacy.bootstrap.SeedAdmin" fork="true" failonerror="true">
+            <classpath refid="compile.path"/>
+        </java>
+    </target>
+    <target name="seed-demo" depends="compile">
+        <java classname="com.example.legacy.bootstrap.SeedDemo" fork="true" failonerror="true">
+            <classpath refid="compile.path"/>
+        </java>
+    </target>
+    <target name="test-pure" depends="init" description="Run Java-only workflow/password tests without Maven Central">
+        <mkdir dir="build/pure-test"/>
+        <javac destdir="build/pure-test" source="1.8" target="1.8" includeantruntime="false" encoding="UTF-8">
+            <src path="src/main/java"/><src path="src/test/java"/>
+            <include name="com/example/legacy/util/Passwords.java"/>
+            <include name="com/example/legacy/util/Workflow.java"/>
+            <include name="com/example/legacy/util/Strings.java"/>
+            <include name="com/example/legacy/FrameworkFreeTests.java"/>
+        </javac>
+        <java classname="com.example.legacy.FrameworkFreeTests" classpath="build/pure-test" fork="true" failonerror="true"/>
+    </target>
+    <target name="clean"><delete dir="build"/><delete dir="dist"/></target>
+</project>

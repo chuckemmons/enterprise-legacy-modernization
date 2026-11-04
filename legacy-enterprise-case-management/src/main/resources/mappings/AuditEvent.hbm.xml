@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.legacy.model">
+ <class name="AuditEvent" table="audit_events" lazy="false">
+  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">audit_events_id_seq</param></generator></id>
+  <property name="entityType" column="entity_type" type="string"/>
+  <property name="entityId" column="entity_id" type="long"/>
+  <property name="actionName" column="action_name" type="string"/>
+  <property name="actor" column="actor" type="string"/>
+  <property name="details" column="details" type="string"/>
+  <property name="createdAt" column="created_at" type="timestamp"/>
+ </class>
+</hibernate-mapping>

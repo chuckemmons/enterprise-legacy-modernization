@@ -1,0 +1,3 @@
+<%@ include file="fragments/header.jspf" %><h1>Audit trail</h1><section class="panel"><div class="scroll"><table><tr><th>Timestamp</th><th>Actor</th><th>Record</th><th>Action</th><th>Details</th></tr>
+<c:forEach var="event" items="${events}"><tr><td><fmt:formatDate value="${event.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td><td><c:out value="${event.actor}"/></td><td><c:out value="${event.entityType}"/> #<c:out value="${event.entityId}"/></td><td><c:out value="${event.actionName}"/></td><td><c:out value="${event.details}"/></td></tr></c:forEach>
+</table></div><p>Page ${page+1}. <a href="${pageContext.request.contextPath}/audit.do?page=${page + 1}">Next page</a></p></section><%@ include file="fragments/footer.jspf" %>

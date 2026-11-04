@@ -1,0 +1,2 @@
+# Optional local Ant settings. Normally use environment variables DB_URL, DB_USER, DB_PASSWORD.
+# Copy this file to build.properties for personal Ant settings (not tracked).

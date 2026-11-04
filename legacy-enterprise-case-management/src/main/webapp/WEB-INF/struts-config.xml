@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+  <form-beans><form-bean name="uploadForm" type="com.example.legacy.web.UploadForm"/></form-beans>
+  <global-forwards><forward name="login" path="/login.do" redirect="true"/><forward name="cases" path="/cases.do" redirect="true"/></global-forwards>
+  <action-mappings>
+    <action path="/login" type="com.example.legacy.web.AuthAction" parameter="login" validate="false"/>
+    <action path="/authenticate" type="com.example.legacy.web.AuthAction" parameter="authenticate" validate="false"/>
+    <action path="/logout" type="com.example.legacy.web.AuthAction" parameter="logout" validate="false"/>
+    <action path="/dashboard" type="com.example.legacy.web.DashboardAction" validate="false"/>
+    <action path="/cases" type="com.example.legacy.web.CaseAction" parameter="list" validate="false"/>
+    <action path="/caseNew" type="com.example.legacy.web.CaseAction" parameter="new" validate="false"/>
+    <action path="/caseCreate" type="com.example.legacy.web.CaseAction" parameter="create" validate="false"/>
+    <action path="/caseView" type="com.example.legacy.web.CaseAction" parameter="view" validate="false"/>
+    <action path="/caseUpdate" type="com.example.legacy.web.CaseAction" parameter="update" validate="false"/>
+    <action path="/caseAssign" type="com.example.legacy.web.CaseAction" parameter="assign" validate="false"/>
+    <action path="/caseTransition" type="com.example.legacy.web.CaseAction" parameter="transition" validate="false"/>
+    <action path="/caseComment" type="com.example.legacy.web.CaseAction" parameter="comment" validate="false"/>
+    <action path="/caseArchive" type="com.example.legacy.web.CaseAction" parameter="archive" validate="false"/>
+    <action path="/caseUpload" name="uploadForm" scope="request" type="com.example.legacy.web.DocumentAction" parameter="upload" validate="false"/>
+    <action path="/caseDownload" type="com.example.legacy.web.DocumentAction" parameter="download" validate="false"/>
+    <action path="/users" type="com.example.legacy.web.UserAction" parameter="list" validate="false"/>
+    <action path="/userCreate" type="com.example.legacy.web.UserAction" parameter="create" validate="false"/>
+    <action path="/userRole" type="com.example.legacy.web.UserAction" parameter="role" validate="false"/>
+    <action path="/userDisable" type="com.example.legacy.web.UserAction" parameter="disable" validate="false"/>
+    <action path="/audit" type="com.example.legacy.web.AuditAction" validate="false"/>
+    <action path="/reports" type="com.example.legacy.web.ReportAction" parameter="page" validate="false"/>
+    <action path="/reportsExport" type="com.example.legacy.web.ReportAction" parameter="csv" validate="false"/>
+    <action path="/notifications" type="com.example.legacy.web.NotificationAction" parameter="list" validate="false"/>
+    <action path="/notificationRead" type="com.example.legacy.web.NotificationAction" parameter="read" validate="false"/>
+  </action-mappings>
+  <controller maxFileSize="3M"/>
+</struts-config>

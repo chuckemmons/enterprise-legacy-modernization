@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.legacy.model">
+ <class name="Account" table="app_users" lazy="false">
+  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">app_users_id_seq</param></generator></id>
+  <property name="username" column="username" type="string"/>
+  <property name="passwordHash" column="password_hash" type="string"/>
+  <property name="displayName" column="display_name" type="string"/>
+  <property name="email" column="email" type="string"/>
+  <property name="role" column="role" type="string"/>
+  <property name="department" column="department" type="string"/>
+  <property name="enabled" column="enabled" type="boolean"/>
+  <property name="createdAt" column="created_at" type="timestamp"/>
+ </class>
+</hibernate-mapping>

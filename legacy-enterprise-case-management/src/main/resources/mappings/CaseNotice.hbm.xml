@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.legacy.model">
+ <class name="CaseNotice" table="case_notices" lazy="false">
+  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">case_notices_id_seq</param></generator></id>
+  <property name="recipient" column="recipient" type="string"/>
+  <property name="subject" column="subject" type="string"/>
+  <property name="message" column="message" type="string"/>
+  <property name="caseId" column="case_id" type="long"/>
+  <property name="read" column="is_read" type="boolean"/>
+  <property name="sentAt" column="sent_at" type="timestamp"/>
+  <property name="createdAt" column="created_at" type="timestamp"/>
+ </class>
+</hibernate-mapping>

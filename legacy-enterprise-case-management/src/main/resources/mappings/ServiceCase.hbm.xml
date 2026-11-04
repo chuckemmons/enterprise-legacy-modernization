@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.legacy.model">
+ <class name="ServiceCase" table="service_cases" lazy="false">
+  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">service_cases_id_seq</param></generator></id>
+  <version name="version" column="version" type="integer"/>
+  <property name="caseNumber" column="case_number" type="string"/>
+  <property name="title" column="title" type="string"/>
+  <property name="description" column="description" type="string"/>
+  <property name="category" column="category" type="string"/>
+  <property name="priority" column="priority" type="string"/>
+  <property name="status" column="status" type="string"/>
+  <property name="createdBy" column="created_by" type="string"/>
+  <property name="assignedTo" column="assigned_to" type="string"/>
+  <property name="department" column="department" type="string"/>
+  <property name="dueAt" column="due_at" type="timestamp"/>
+  <property name="closedAt" column="closed_at" type="timestamp"/>
+  <property name="createdAt" column="created_at" type="timestamp"/>
+  <property name="updatedAt" column="updated_at" type="timestamp"/>
+  <property name="archived" column="archived" type="boolean"/>
+  <property name="overdueNoticeSent" column="overdue_notice_sent" type="boolean"/>
+ </class>
+</hibernate-mapping>
