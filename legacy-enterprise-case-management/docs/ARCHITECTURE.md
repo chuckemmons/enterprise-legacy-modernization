@@ -296,4 +296,4 @@ A case creator cannot approve their own case. An administrator can archive a cas
 4. **Audit**: preserve the authoritative event history while write paths move.
 5. **Rollback**: retain a path-by-path reversible routing switch; never concurrently write the same row through two implementations without explicit concurrency handling.
 
-See `MODERNIZATION_BACKLOG.md` for phased user stories.
+See the [project modernization backlog](../../docs/MODERNIZATION_BACKLOG.md) for phased user stories.

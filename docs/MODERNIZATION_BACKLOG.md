@@ -6,6 +6,11 @@ The business scenario stays the same. Begin with an operational Struts 1/Hiberna
 
 **MOD-001 — Characterization tests.** As a technical lead, I want a repeatable integration suite covering login, case creation, assignment, processing, approval, closure, audit and attachments so migration preserves business behavior. Acceptance: same input fixture generates equivalent status, ownership and audit output on both implementations.
 
+Legacy baseline and shared comparison contract: [characterization-tests](../characterization-tests/README.md).
+Run with `-Pcharacterization`; replacement parity acceptance remains pending a replacement adapter.
+Design: [ADR-0001](adr/0001-characterization-test-strategy.md).
+Coverage and validation: [MOD-001 requirements review](../characterization-tests/docs/MOD-001-verification.md).
+
 **MOD-002 — Legacy observability.** As an operator, I want request IDs, transaction duration metrics, structured logs and functional checks so I can compare new and old behavior. Acceptance: dashboard traces each migrated request to its responsible implementation; no passwords logged.
 
 **MOD-003 — Reversible proxy routing.** As an architect, I want feature-by-feature routing so individual workflows can be transferred to the new application and rolled back without database corruption. Acceptance: route toggles are documented and tested under both versions.
@@ -45,4 +50,4 @@ The business scenario stays the same. Begin with an operational Struts 1/Hiberna
 3. Migrate a single write workflow, then notifications, then document storage.
 4. Retire Struts actions/DAO code only when old routes have no callers and historical data remains accessible.
 
-For each story capture an Architecture Decision Record with context, options, chosen design, test strategy, rollback and ownership boundaries. Use Java 21/Angular in the replacement only; keep this repository frozen as the historical comparison.
+For each story capture an Architecture Decision Record with context, options, chosen design, test strategy, rollback and ownership boundaries. Keep this project-wide backlog in the repository-root `docs/` directory and decision records in `docs/adr/`. Use Java 21/Angular in the replacement only; keep this repository frozen as the historical comparison.

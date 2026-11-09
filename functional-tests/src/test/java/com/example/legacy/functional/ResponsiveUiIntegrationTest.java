@@ -44,8 +44,11 @@ public class ResponsiveUiIntegrationTest {
     assertTrue(toggle.isDisplayed());
     assertEquals("false", toggle.getAttribute("aria-expanded"));
     toggle.sendKeys(Keys.ENTER);
+    // The container becomes visible before Bootstrap finishes expanding its clipped links.
     new WebDriverWait(driver, Duration.ofSeconds(5))
-        .until(ExpectedConditions.visibilityOfElementLocated(By.id("primary-navigation")));
+        .until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("#primary-navigation.collapse.show")));
     assertEquals("true", toggle.getAttribute("aria-expanded"));
     driver.findElement(By.cssSelector("#primary-navigation a[href$='/cases.do']")).click();
     assertEquals(

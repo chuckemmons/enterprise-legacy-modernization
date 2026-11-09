@@ -33,7 +33,7 @@ An **educational, intentionally legacy** Java EE web application designed as the
 
 ### Reserved for your Strangler Fig implementation
 
-See `docs/MODERNIZATION_BACKLOG.md`: Angular search, richer case dashboards, granular authorization, external identity/SSO, configurable approvals, document storage migration, richer reminders/escalation, integration APIs, accessible UX and deeper integration testing. Those features are **not** implemented here.
+See the [project modernization backlog](../docs/MODERNIZATION_BACKLOG.md): Angular search, richer case dashboards, granular authorization, external identity/SSO, configurable approvals, document storage migration, richer reminders/escalation, integration APIs, accessible UX and deeper integration testing. Those features are **not** implemented here.
 
 ## Package structure
 

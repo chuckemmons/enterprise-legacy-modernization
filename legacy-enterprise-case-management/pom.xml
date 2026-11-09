@@ -195,6 +195,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <!-- Test harnesses consume services without copying production sources. -->
+                    <attachClasses>true</attachClasses>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

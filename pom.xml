@@ -100,10 +100,25 @@
 
     <profiles>
         <profile>
+            <id>characterization</id>
+            <modules>
+                <module>characterization-tests</module>
+            </modules>
+        </profile>
+        <profile>
             <id>sonar</id>
+            <!-- Keep the analysis reactor aligned with the complete IntelliJ project. -->
+            <modules>
+                <module>characterization-tests</module>
+                <module>functional-tests</module>
+            </modules>
             <properties>
                 <sonar.projectKey>legacy-enterprise-case-management</sonar.projectKey>
                 <sonar.host.url>http://localhost:9000</sonar.host.url>
+                <!-- Let Maven discover production, test, and build-helper fixture source roots. -->
+                <sonar.maven.scanAll>true</sonar.maven.scanAll>
+                <sonar.exclusions>**/target/**,**/out/**,**/.idea/**,**/.scannerwork/**,**/build/browser/**</sonar.exclusions>
+                <sonar.junit.reportPaths>${project.build.directory}/surefire-reports,${project.build.directory}/failsafe-reports</sonar.junit.reportPaths>
             </properties>
             <build>
                 <plugins>
