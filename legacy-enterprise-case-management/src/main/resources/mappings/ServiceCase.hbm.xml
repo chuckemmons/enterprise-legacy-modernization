@@ -1,23 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping package="com.example.legacy.model">
- <class name="ServiceCase" table="service_cases" lazy="false">
-  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">service_cases_id_seq</param></generator></id>
-  <version name="version" column="version" type="integer"/>
-  <property name="caseNumber" column="case_number" type="string"/>
-  <property name="title" column="title" type="string"/>
-  <property name="description" column="description" type="string"/>
-  <property name="category" column="category" type="string"/>
-  <property name="priority" column="priority" type="string"/>
-  <property name="status" column="status" type="string"/>
-  <property name="createdBy" column="created_by" type="string"/>
-  <property name="assignedTo" column="assigned_to" type="string"/>
-  <property name="department" column="department" type="string"/>
-  <property name="dueAt" column="due_at" type="timestamp"/>
-  <property name="closedAt" column="closed_at" type="timestamp"/>
-  <property name="createdAt" column="created_at" type="timestamp"/>
-  <property name="updatedAt" column="updated_at" type="timestamp"/>
-  <property name="archived" column="archived" type="boolean"/>
-  <property name="overdueNoticeSent" column="overdue_notice_sent" type="boolean"/>
- </class>
+    <class name="ServiceCase" table="service_cases" lazy="false">
+        <id name="id" type="long" column="id">
+            <generator class="sequence">
+                <param name="sequence">service_cases_id_seq</param>
+            </generator>
+        </id>
+        <version name="version" type="integer">
+            <column name="version" not-null="true" default="0"/>
+        </version>
+        <property name="caseNumber" type="string" column="case_number" not-null="true" length="40" unique="true"/>
+        <property name="title" type="string" column="title" not-null="true" length="180"/>
+        <property name="description" type="string">
+            <column name="description" not-null="true" sql-type="text"/>
+        </property>
+        <property name="category" type="string" column="category" not-null="true" length="60"/>
+        <property name="priority" type="string" column="priority" not-null="true" length="12"/>
+        <property name="status" type="string" column="status" not-null="true" length="32"/>
+        <property name="createdBy" type="string" column="created_by" not-null="true" length="60"/>
+        <property name="assignedTo" type="string" column="assigned_to" not-null="false" length="60"/>
+        <property name="department" type="string" column="department" not-null="true" length="80"/>
+        <property name="dueAt" type="timestamp" column="due_at" not-null="false"/>
+        <property name="closedAt" type="timestamp" column="closed_at" not-null="false"/>
+        <property name="createdAt" type="timestamp">
+            <column name="created_at" not-null="true" default="now()"/>
+        </property>
+        <property name="updatedAt" type="timestamp">
+            <column name="updated_at" not-null="true" default="now()"/>
+        </property>
+        <property name="archived" type="boolean">
+            <column name="archived" not-null="true" default="FALSE"/>
+        </property>
+        <property name="overdueNoticeSent" type="boolean">
+            <column name="overdue_notice_sent" not-null="true" default="FALSE"/>
+        </property>
+    </class>
+
+    <query name="ServiceCase.search"><![CDATA[
+        from ServiceCase c where c.archived=false
+        and (:q is null or lower(c.title) like :q or lower(c.caseNumber) like :q)
+        and (:status is null or c.status=:status)
+        and (:assignee is null or c.assignedTo=:assignee)
+        order by c.updatedAt desc, c.id desc
+    ]]></query>
+
+    <query name="ServiceCase.countByStatus"><![CDATA[
+        select status, count(id) from ServiceCase where archived=false
+        group by status
+        order by status
+    ]]></query>
+
+    <query name="ServiceCase.countByPriority"><![CDATA[
+        select priority, count(id) from ServiceCase where archived=false
+        group by priority
+        order by priority
+    ]]></query>
+
+    <query name="ServiceCase.countOverdue"><![CDATA[
+        select count(id) from ServiceCase where archived=false
+        and status <> :closedStatus
+        and dueAt < :now
+    ]]></query>
+
+    <query name="ServiceCase.findOverdueAwaitingNotification"><![CDATA[
+        from ServiceCase where archived=false
+        and status <> :closedStatus
+        and dueAt < :now
+        and overdueNoticeSent=false
+    ]]></query>
 </hibernate-mapping>

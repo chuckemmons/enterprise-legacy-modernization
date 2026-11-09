@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.datasource">java:comp/env/jdbc/LegacyCases</property>
+    <property name="hibernate.dialect">com.example.legacy.functional.fixture.H2LegacyDialect</property>
+    <property name="hibernate.show_sql">false</property>
+    <property name="hibernate.format_sql">true</property>
+    <property name="hibernate.hbm2ddl.auto">validate</property>
+    <mapping resource="mappings/Account.hbm.xml"/>
+    <mapping resource="mappings/ServiceCase.hbm.xml"/>
+    <mapping resource="mappings/CaseNote.hbm.xml"/>
+    <mapping resource="mappings/CaseDocument.hbm.xml"/>
+    <mapping resource="mappings/AuditEvent.hbm.xml"/>
+    <mapping resource="mappings/CaseNotice.hbm.xml"/>
+  </session-factory>
+</hibernate-configuration>

@@ -1,33 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/struts-config_1_3.dtd">
 <struts-config>
-  <form-beans><form-bean name="uploadForm" type="com.example.legacy.web.UploadForm"/></form-beans>
-  <global-forwards><forward name="login" path="/login.do" redirect="true"/><forward name="cases" path="/cases.do" redirect="true"/></global-forwards>
-  <action-mappings>
-    <action path="/login" type="com.example.legacy.web.AuthAction" parameter="login" validate="false"/>
-    <action path="/authenticate" type="com.example.legacy.web.AuthAction" parameter="authenticate" validate="false"/>
-    <action path="/logout" type="com.example.legacy.web.AuthAction" parameter="logout" validate="false"/>
-    <action path="/dashboard" type="com.example.legacy.web.DashboardAction" validate="false"/>
-    <action path="/cases" type="com.example.legacy.web.CaseAction" parameter="list" validate="false"/>
-    <action path="/caseNew" type="com.example.legacy.web.CaseAction" parameter="new" validate="false"/>
-    <action path="/caseCreate" type="com.example.legacy.web.CaseAction" parameter="create" validate="false"/>
-    <action path="/caseView" type="com.example.legacy.web.CaseAction" parameter="view" validate="false"/>
-    <action path="/caseUpdate" type="com.example.legacy.web.CaseAction" parameter="update" validate="false"/>
-    <action path="/caseAssign" type="com.example.legacy.web.CaseAction" parameter="assign" validate="false"/>
-    <action path="/caseTransition" type="com.example.legacy.web.CaseAction" parameter="transition" validate="false"/>
-    <action path="/caseComment" type="com.example.legacy.web.CaseAction" parameter="comment" validate="false"/>
-    <action path="/caseArchive" type="com.example.legacy.web.CaseAction" parameter="archive" validate="false"/>
-    <action path="/caseUpload" name="uploadForm" scope="request" type="com.example.legacy.web.DocumentAction" parameter="upload" validate="false"/>
-    <action path="/caseDownload" type="com.example.legacy.web.DocumentAction" parameter="download" validate="false"/>
-    <action path="/users" type="com.example.legacy.web.UserAction" parameter="list" validate="false"/>
-    <action path="/userCreate" type="com.example.legacy.web.UserAction" parameter="create" validate="false"/>
-    <action path="/userRole" type="com.example.legacy.web.UserAction" parameter="role" validate="false"/>
-    <action path="/userDisable" type="com.example.legacy.web.UserAction" parameter="disable" validate="false"/>
-    <action path="/audit" type="com.example.legacy.web.AuditAction" validate="false"/>
-    <action path="/reports" type="com.example.legacy.web.ReportAction" parameter="page" validate="false"/>
-    <action path="/reportsExport" type="com.example.legacy.web.ReportAction" parameter="csv" validate="false"/>
-    <action path="/notifications" type="com.example.legacy.web.NotificationAction" parameter="list" validate="false"/>
-    <action path="/notificationRead" type="com.example.legacy.web.NotificationAction" parameter="read" validate="false"/>
-  </action-mappings>
-  <controller maxFileSize="3M"/>
+
+    <form-beans>
+        <form-bean name="authForm" type="com.example.legacy.web.AuthForm"/>
+        <form-bean name="caseForm" type="com.example.legacy.web.CaseForm"/>
+        <form-bean name="userForm" type="com.example.legacy.web.UserForm"/>
+        <form-bean name="reportForm" type="com.example.legacy.web.ReportForm"/>
+        <form-bean name="dashboardForm" type="com.example.legacy.web.ReportForm"/>
+        <form-bean name="auditForm" type="com.example.legacy.web.AuditForm"/>
+        <form-bean name="notificationForm" type="com.example.legacy.web.NotificationForm"/>
+        <form-bean name="uploadForm" type="com.example.legacy.web.UploadForm"/>
+    </form-beans>
+
+    <global-forwards>
+        <forward name="login" path="/login.do" redirect="true"/>
+        <forward name="cases" path="/cases.do" redirect="true"/>
+    </global-forwards>
+
+    <action-mappings>
+        <action path="/login" type="com.example.legacy.web.AuthAction" parameter="login" validate="true" name="authForm"
+                scope="request" input="page.login"/>
+        <action path="/authenticate" type="com.example.legacy.web.AuthAction" parameter="authenticate" validate="true"
+                name="authForm" scope="request" input="page.login"/>
+        <action path="/logout" type="com.example.legacy.web.AuthAction" parameter="logout" validate="true"
+                name="authForm" scope="request" input="page.login"/>
+        <action path="/dashboard" type="com.example.legacy.web.DashboardAction" validate="true" name="dashboardForm"
+                scope="request" input="/dashboardInput.do"/>
+        <action path="/cases" type="com.example.legacy.web.CaseAction" parameter="list" validate="true" name="caseForm"
+                scope="request" input="/casesInput.do"/>
+        <action path="/caseNew" type="com.example.legacy.web.CaseAction" parameter="new" validate="true" name="caseForm"
+                scope="request" input="page.case-new"/>
+        <action path="/caseCreate" type="com.example.legacy.web.CaseAction" parameter="create" validate="true"
+                name="caseForm" scope="request" input="page.case-new"/>
+        <action path="/caseView" type="com.example.legacy.web.CaseAction" parameter="view" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseUpdate" type="com.example.legacy.web.CaseAction" parameter="update" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseAssign" type="com.example.legacy.web.CaseAction" parameter="assign" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseTransition" type="com.example.legacy.web.CaseAction" parameter="transition" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseComment" type="com.example.legacy.web.CaseAction" parameter="comment" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseArchive" type="com.example.legacy.web.CaseAction" parameter="archive" validate="true"
+                name="caseForm" scope="request" input="/caseInput.do"/>
+        <action path="/caseUpload" type="com.example.legacy.web.DocumentAction" parameter="upload" validate="true"
+                name="uploadForm" scope="request" input="page.upload-errors"/>
+        <action path="/caseDownload" type="com.example.legacy.web.DocumentAction" parameter="download" validate="true"
+                name="uploadForm" scope="request" input="page.error"/>
+        <action path="/users" type="com.example.legacy.web.UserAction" parameter="list" validate="true" name="userForm"
+                scope="request" input="/usersInput.do"/>
+        <action path="/userCreate" type="com.example.legacy.web.UserAction" parameter="create" validate="true"
+                name="userForm" scope="request" input="/usersInput.do"/>
+        <action path="/userRole" type="com.example.legacy.web.UserAction" parameter="role" validate="true"
+                name="userForm" scope="request" input="/usersInput.do"/>
+        <action path="/userDisable" type="com.example.legacy.web.UserAction" parameter="disable" validate="true"
+                name="userForm" scope="request" input="/usersInput.do"/>
+        <action path="/audit" type="com.example.legacy.web.AuditAction" validate="true" name="auditForm" scope="request"
+                input="/auditInput.do"/>
+        <action path="/reports" type="com.example.legacy.web.ReportAction" parameter="page" validate="true"
+                name="reportForm" scope="request" input="/reportsInput.do"/>
+        <action path="/reportsExport" type="com.example.legacy.web.ReportAction" parameter="csv" validate="true"
+                name="reportForm" scope="request" input="/reportsInput.do"/>
+        <action path="/notifications" type="com.example.legacy.web.NotificationAction" parameter="list" validate="true"
+                name="notificationForm" scope="request" input="/notificationsInput.do"/>
+        <action path="/notificationRead" type="com.example.legacy.web.NotificationAction" parameter="read"
+                validate="true" name="notificationForm" scope="request" input="/notificationsInput.do"/>
+        <action path="/caseInput" type="com.example.legacy.web.ValidationInputAction" parameter="case" name="caseForm"
+                scope="request" validate="true" input="page.error"/>
+        <action path="/casesInput" type="com.example.legacy.web.ValidationInputAction" parameter="cases" name="caseForm"
+                scope="request" validate="true" input="page.error"/>
+        <action path="/usersInput" type="com.example.legacy.web.ValidationInputAction" parameter="users" name="userForm"
+                scope="request" validate="true" input="page.error"/>
+        <action path="/auditInput" type="com.example.legacy.web.ValidationInputAction" parameter="audit"
+                name="auditForm" scope="request" validate="true" input="page.error"/>
+        <action path="/notificationsInput" type="com.example.legacy.web.ValidationInputAction" parameter="notifications"
+                name="notificationForm" scope="request" validate="true" input="page.error"/>
+        <action path="/reportsInput" type="com.example.legacy.web.ValidationInputAction" parameter="reports"
+                name="reportForm" scope="request" validate="true" input="page.error"/>
+        <action path="/dashboardInput" type="com.example.legacy.web.ValidationInputAction" parameter="dashboard"
+                name="dashboardForm" scope="request" validate="true" input="page.error"/>
+    </action-mappings>
+
+    <controller processorClass="org.apache.struts.tiles.TilesRequestProcessor" inputForward="false" maxFileSize="3M"/>
+
+    <message-resources parameter="ApplicationResources"/>
+
+    <plug-in className="org.apache.struts.tiles.TilesPlugin">
+        <set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml"/>
+        <set-property property="definitions-parser-validate" value="true"/>
+        <set-property property="moduleAware" value="true"/>
+    </plug-in>
+
+    <plug-in className="com.example.legacy.web.ApplicationValidatorPlugIn">
+        <set-property property="pathnames"
+                      value="/org/apache/struts/validator/validator-rules.xml,/WEB-INF/validation.xml"/>
+    </plug-in>
+
 </struts-config>

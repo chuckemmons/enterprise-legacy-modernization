@@ -1,0 +1,15 @@
+<%--
+    Business case: Supply shared localization and view options so case-management
+    pages present consistent labels, limits, and routes.
+
+    Author: Chuck Emmons
+--%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<jsp:useBean id="viewOptions" class="com.example.legacy.web.ViewOptionsUtil" scope="application"/>
+<fmt:setLocale value="${empty sessionScope['org.apache.struts.action.LOCALE']
+                        ? pageContext.request.locale : sessionScope['org.apache.struts.action.LOCALE']}"/>
+<fmt:setBundle basename="ApplicationResources"/>

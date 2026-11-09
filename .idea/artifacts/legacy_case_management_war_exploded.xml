@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="legacy-case-management:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/legacy_case_management_war_exploded</output-path>
+    <root id="root">
+      <element id="artifact" artifact-name="legacy-enterprise-case-management:war exploded" />
+    </root>
+  </artifact>
+</component>

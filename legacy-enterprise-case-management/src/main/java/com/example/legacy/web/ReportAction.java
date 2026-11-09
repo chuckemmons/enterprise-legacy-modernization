@@ -1,29 +1,101 @@
 package com.example.legacy.web;
-import com.example.legacy.service.BackOffice;
-import com.example.legacy.service.Services;
-import com.example.legacy.model.ServiceCase;
-import com.example.legacy.util.Strings;
-import java.io.*;
-import javax.servlet.http.*;
-import org.apache.struts.action.*;
+
+import com.example.legacy.service.BackOfficeService;
+import com.example.legacy.service.dto.CaseDto;
+import com.example.legacy.service.dto.ReportPageDto;
+import com.example.legacy.util.ContentTypes;
+import com.example.legacy.util.MessageKeys;
+import com.example.legacy.util.MessagesUtil;
+import com.example.legacy.util.StringsUtil;
+import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+/**
+ * Presents operational reports and serializes entity-free case DTOs as CSV.
+ *
+ * @author Chuck Emmons
+ */
 public final class ReportAction extends Action {
- @Override public ActionForward execute(ActionMapping m,ActionForm f,HttpServletRequest r,HttpServletResponse resp) {
-   try {
-     Web.requireReporting(r);
-     if("page".equals(m.getParameter())) {
-       r.setAttribute("statusRows",BackOffice.groupedStatus());r.setAttribute("priorityRows",BackOffice.groupedPriority());
-       r.setAttribute("overdue",BackOffice.countOverdue());return Web.jsp("reports");
-     }
-     // CSV deliberately capped to 5,000 records to protect the legacy server.
-     resp.setContentType("text/csv; charset=UTF-8");resp.setHeader("Content-Disposition","attachment; filename=\"cases.csv\"");
-     PrintWriter w=resp.getWriter();w.println("Case Number,Title,Category,Priority,Status,Assignee,Department");
-     for(int page=0;page<10;page++) {
-       java.util.List<ServiceCase> batch=Services.search(null,null,null,page,500);
-       if(batch.isEmpty())break;
-       for(ServiceCase c:batch)w.println(Strings.csv(c.getCaseNumber())+","+Strings.csv(c.getTitle())+","+Strings.csv(c.getCategory())+","+Strings.csv(c.getPriority())+","+Strings.csv(c.getStatus())+","+Strings.csv(c.getAssignedTo())+","+Strings.csv(c.getDepartment()));
-       if(batch.size()<500)break;
-     }
-     return null;
-   }catch(Exception e){return Web.fail(r,e);}
- }
+  private final BackOfficeService backOfficeService;
+
+  /** Creates this action and its reusable service collaborators. */
+  public ReportAction() {
+    this(new BackOfficeService());
+  }
+
+  /**
+   * Accepts explicitly supplied application collaborators for request-processing tests.
+   *
+   * @param backOfficeService the back office service collaborator
+   * @throws NullPointerException if {@code backOfficeService} is {@code null}
+   */
+  public ReportAction(BackOfficeService backOfficeService) {
+    this.backOfficeService =
+        java.util.Objects.requireNonNull(backOfficeService, "backOfficeService");
+  }
+
+  /**
+   * Maps the report form to service input, populates it from DTO results, and renders or exports
+   * its data.
+   *
+   * @param mapping the Struts mapping for the current operation
+   * @param form the form containing the submitted values
+   * @param request the current HTTP request
+   * @param response the HTTP response to populate
+   * @return the next page forward or redirect, or {@code null} when the response is written
+   *     directly
+   * @throws IllegalArgumentException if a message pattern or formatting argument is invalid
+   * @throws NullPointerException if {@code request} is {@code null}
+   * @throws java.util.MissingResourceException if a required message bundle or message key cannot
+   *     be found
+   */
+  @Override
+  public ActionForward execute(
+      ActionMapping mapping,
+      ActionForm form,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    try {
+      ReportForm reportForm = (ReportForm) form;
+      ReportPageDto data = reportForm.getData();
+      String actor = WebUtil.getAuthenticatedUsername(request);
+      if (ActionOperation.PAGE.matchesParameter(mapping.getParameter())) {
+        reportForm.setData(
+            ReportPageDto.builder(data).summary(backOfficeService.getReportSummary(actor)).build());
+        return WebUtil.createViewForward(PageView.REPORTS);
+      }
+      reportForm.setData(
+          ReportPageDto.builder(data).cases(backOfficeService.exportCases(actor)).build());
+      response.setContentType(ContentTypes.CSV_UTF8);
+      response.setHeader(HttpConstants.CONTENT_DISPOSITION, HttpConstants.CASE_EXPORT_DISPOSITION);
+      PrintWriter writer = response.getWriter();
+      writer.println(
+          MessagesUtil.formatMessage(
+              WebUtil.resolveLocale(request), MessageKeys.REPORT_CSV_HEADER));
+      for (CaseDto item : reportForm.getCases()) {
+        writer.println(
+            StringsUtil.escapeCsvCell(item.getCaseNumber())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getTitle())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getCategory())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getPriority())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getStatus())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getAssignedTo())
+                + ","
+                + StringsUtil.escapeCsvCell(item.getDepartment()));
+      }
+      return null;
+    } catch (Exception exception) {
+      return WebUtil.createFailureForward(request, exception);
+    }
+  }
 }

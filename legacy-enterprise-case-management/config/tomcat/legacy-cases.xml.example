@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copy outside the WAR to CATALINA_BASE/conf/Catalina/localhost/<context-name>.xml. -->
+<Context>
+    <Resource name="jdbc/LegacyCases" auth="Container" type="javax.sql.DataSource"
+              factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/legacy_cases"
+              username="legacy_app" password="REPLACE_IN_DEPLOYMENT_CONFIGURATION"
+              initialSize="0" maxTotal="20" maxIdle="10" minIdle="2" maxWaitMillis="10000"
+              validationQuery="SELECT 1" validationQueryTimeout="3" testOnBorrow="true"/>
+</Context>

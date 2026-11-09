@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping package="com.example.legacy.model">
- <class name="Account" table="app_users" lazy="false">
-  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">app_users_id_seq</param></generator></id>
-  <property name="username" column="username" type="string"/>
-  <property name="passwordHash" column="password_hash" type="string"/>
-  <property name="displayName" column="display_name" type="string"/>
-  <property name="email" column="email" type="string"/>
-  <property name="role" column="role" type="string"/>
-  <property name="department" column="department" type="string"/>
-  <property name="enabled" column="enabled" type="boolean"/>
-  <property name="createdAt" column="created_at" type="timestamp"/>
- </class>
+    <class name="Account" table="app_users" lazy="false">
+        <id name="id" type="long" column="id">
+            <generator class="sequence">
+                <param name="sequence">app_users_id_seq</param>
+            </generator>
+        </id>
+        <property name="username" type="string" column="username" not-null="true" length="60" unique="true"/>
+        <property name="passwordHash" type="string" column="password_hash" not-null="true" length="200"/>
+        <property name="displayName" type="string" column="display_name" not-null="true" length="120"/>
+        <property name="email" type="string" column="email" not-null="false" length="254"/>
+        <property name="role" type="string" column="role" not-null="true" length="24"/>
+        <property name="department" type="string" column="department" not-null="true" length="80"/>
+        <property name="enabled" type="boolean">
+            <column name="enabled" not-null="true" default="TRUE"/>
+        </property>
+        <property name="createdAt" type="timestamp">
+            <column name="created_at" not-null="true" default="now()"/>
+        </property>
+    </class>
+
+    <query name="Account.findByUsername"><![CDATA[
+        from Account where username=:u
+    ]]></query>
+
+    <query name="Account.findAll"><![CDATA[
+        from Account
+        order by username
+    ]]></query>
 </hibernate-mapping>

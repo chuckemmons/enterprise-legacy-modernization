@@ -1,0 +1,10 @@
+# IntelliJ compiler output and generated deployment artifacts.
+/out/
+**/target/
+**/.scannerwork/
+
+# Compiled Java bytecode, including files generated outside normal output folders.
+*.class
+
+# Maven imports regenerate IntelliJ module definitions.
+*.iml

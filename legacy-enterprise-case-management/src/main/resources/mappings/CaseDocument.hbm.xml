@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping package="com.example.legacy.model">
- <class name="CaseDocument" table="case_documents" lazy="false">
-  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">case_documents_id_seq</param></generator></id>
-  <property name="caseId" column="case_id" type="long"/>
-  <property name="originalName" column="original_name" type="string"/>
-  <property name="contentType" column="content_type" type="string"/>
-  <property name="contentSize" column="content_size" type="integer"/>
-  <property name="payload" column="payload" type="binary"/>
-  <property name="uploadedBy" column="uploaded_by" type="string"/>
-  <property name="createdAt" column="created_at" type="timestamp"/>
- </class>
+    <class name="CaseDocument" table="case_documents" lazy="false">
+        <id name="id" type="long" column="id">
+            <generator class="sequence">
+                <param name="sequence">case_documents_id_seq</param>
+            </generator>
+        </id>
+        <property name="caseId" type="long" column="case_id" not-null="true"/>
+        <property name="originalName" type="string" column="original_name" not-null="true" length="250"/>
+        <property name="contentType" type="string" column="content_type" not-null="true" length="120"/>
+        <property name="contentSize" type="integer" column="content_size" not-null="true"/>
+        <property name="payload" type="binary">
+            <column name="payload" not-null="true" sql-type="bytea"/>
+        </property>
+        <property name="uploadedBy" type="string" column="uploaded_by" not-null="true" length="60"/>
+        <property name="createdAt" type="timestamp">
+            <column name="created_at" not-null="true" default="now()"/>
+        </property>
+    </class>
+
+    <query name="CaseDocument.findByCaseId"><![CDATA[
+        from CaseDocument where caseId=:id
+        order by createdAt desc
+    ]]></query>
 </hibernate-mapping>

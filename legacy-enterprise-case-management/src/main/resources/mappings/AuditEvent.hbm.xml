@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping package="com.example.legacy.model">
- <class name="AuditEvent" table="audit_events" lazy="false">
-  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">audit_events_id_seq</param></generator></id>
-  <property name="entityType" column="entity_type" type="string"/>
-  <property name="entityId" column="entity_id" type="long"/>
-  <property name="actionName" column="action_name" type="string"/>
-  <property name="actor" column="actor" type="string"/>
-  <property name="details" column="details" type="string"/>
-  <property name="createdAt" column="created_at" type="timestamp"/>
- </class>
+    <class name="AuditEvent" table="audit_events" lazy="false">
+        <id name="id" type="long" column="id">
+            <generator class="sequence">
+                <param name="sequence">audit_events_id_seq</param>
+            </generator>
+        </id>
+        <property name="entityType" type="string" column="entity_type" not-null="true" length="40"/>
+        <property name="entityId" type="long" column="entity_id" not-null="false"/>
+        <property name="actionName" type="string" column="action_name" not-null="true" length="40"/>
+        <property name="actor" type="string" column="actor" not-null="true" length="60"/>
+        <property name="details" type="string" column="details" not-null="true" length="4000"/>
+        <property name="createdAt" type="timestamp">
+            <column name="created_at" not-null="true" default="now()"/>
+        </property>
+    </class>
+
+    <query name="AuditEvent.findRecent"><![CDATA[
+        from AuditEvent
+        order by createdAt desc
+    ]]></query>
 </hibernate-mapping>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/tiles-config_1_3.dtd">
+<tiles-definitions>
+    <definition name="layout.main" path="/WEB-INF/views/layouts/main.jsp">
+        <put name="titleKey" value="page.title.main" type="string"/>
+        <put name="header" value="/WEB-INF/views/fragments/header.jsp" type="page"/>
+        <put name="messages" value="/WEB-INF/views/fragments/messages.jsp" type="page"/>
+        <put name="footer" value="/WEB-INF/views/fragments/footer.jsp" type="page"/>
+    </definition>
+    <definition name="page.login" extends="layout.main">
+        <put name="titleKey" value="page.title.login" type="string"/>
+        <put name="body" value="/WEB-INF/views/login.jsp" type="page"/>
+    </definition>
+    <definition name="page.dashboard" extends="layout.main">
+        <put name="titleKey" value="page.title.dashboard" type="string"/>
+        <put name="body" value="/WEB-INF/views/dashboard.jsp" type="page"/>
+    </definition>
+    <definition name="page.cases" extends="layout.main">
+        <put name="titleKey" value="page.title.cases" type="string"/>
+        <put name="body" value="/WEB-INF/views/cases.jsp" type="page"/>
+    </definition>
+    <definition name="page.case-new" extends="layout.main">
+        <put name="titleKey" value="page.title.case-new" type="string"/>
+        <put name="body" value="/WEB-INF/views/case-new.jsp" type="page"/>
+    </definition>
+    <definition name="page.case-view" extends="layout.main">
+        <put name="titleKey" value="page.title.case-view" type="string"/>
+        <put name="body" value="/WEB-INF/views/case-view.jsp" type="page"/>
+    </definition>
+    <definition name="page.users" extends="layout.main">
+        <put name="titleKey" value="page.title.users" type="string"/>
+        <put name="body" value="/WEB-INF/views/users.jsp" type="page"/>
+    </definition>
+    <definition name="page.audit" extends="layout.main">
+        <put name="titleKey" value="page.title.audit" type="string"/>
+        <put name="body" value="/WEB-INF/views/audit.jsp" type="page"/>
+    </definition>
+    <definition name="page.reports" extends="layout.main">
+        <put name="titleKey" value="page.title.reports" type="string"/>
+        <put name="body" value="/WEB-INF/views/reports.jsp" type="page"/>
+    </definition>
+    <definition name="page.notifications" extends="layout.main">
+        <put name="titleKey" value="page.title.notifications" type="string"/>
+        <put name="body" value="/WEB-INF/views/notifications.jsp" type="page"/>
+    </definition>
+    <definition name="page.upload-errors" extends="layout.main">
+        <put name="titleKey" value="page.title.upload-errors" type="string"/>
+        <put name="body" value="/WEB-INF/views/upload-errors.jsp" type="page"/>
+    </definition>
+    <definition name="page.error" extends="layout.main">
+        <put name="titleKey" value="page.title.error" type="string"/>
+        <put name="body" value="/WEB-INF/views/error.jsp" type="page"/>
+    </definition>
+</tiles-definitions>

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.3.0//EN" "http://jakarta.apache.org/commons/dtds/validator_1_3_0.dtd">
+<form-validation>
+    
+    <formset>
+        <form name="AuditForm">
+        </form>
+        <form name="AuthForm.authenticate">
+            <field property="username" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.username" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.USERNAME</var-value>
+                </var>
+            </field>
+            <field property="password" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.password" position="0" resource="true" />
+            </field>
+        </form>
+        <form name="AuthForm.login">
+        </form>
+        <form name="AuthForm.logout">
+        </form>
+        <form name="CaseForm.archive">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="CaseForm.assign">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+            <field property="assignee" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.assignee" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.USERNAME</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="CaseForm.comment">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+            <field property="body" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.note" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.COMMENT</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="CaseForm.create">
+            <field property="title" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.title" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.TITLE</var-value>
+                </var>
+            </field>
+            <field property="description" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.description" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.DESCRIPTION</var-value>
+                </var>
+            </field>
+            <field property="priority" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.priority" position="0" resource="true" />
+            </field>
+            <field property="due" depends="date">
+                <msg name="date" key="validation.date" />
+                <arg key="field.due.date" position="0" resource="true" />
+                <var>
+                    <var-name>datePatternStrict</var-name>
+                    <var-value>limit.INPUT_DATE_PATTERN</var-value>
+                </var>
+            </field>
+            <field property="category" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.category" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.CATEGORY</var-value>
+                </var>
+            </field>
+            <field property="department" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.department" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.DEPARTMENT</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="CaseForm.list">
+            <field property="q" depends="maxlength">
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.search" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.SEARCH</var-value>
+                </var>
+            </field>
+            <field property="assignee" depends="maxlength">
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.assigned.user" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.USERNAME</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="CaseForm.new">
+        </form>
+        <form name="CaseForm.transition">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+            <field property="destination" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.next.status" position="0" resource="true" />
+            </field>
+        </form>
+        <form name="CaseForm.update">
+            <field property="title" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.title" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.TITLE</var-value>
+                </var>
+            </field>
+            <field property="description" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.description" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.DESCRIPTION</var-value>
+                </var>
+            </field>
+            <field property="priority" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.priority" position="0" resource="true" />
+            </field>
+            <field property="due" depends="date">
+                <msg name="date" key="validation.date" />
+                <arg key="field.due.date" position="0" resource="true" />
+                <var>
+                    <var-name>datePatternStrict</var-name>
+                    <var-value>limit.INPUT_DATE_PATTERN</var-value>
+                </var>
+            </field>
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+            <field property="version" depends="required,integer,intRange">
+                <msg name="required" key="validation.version" />
+                <msg name="integer" key="validation.version" />
+                <msg name="intRange" key="validation.version" />
+                <var>
+                    <var-name>min</var-name>
+                    <var-value>0</var-value>
+                </var>
+                <var>
+                    <var-name>max</var-name>
+                    <var-value>2147483647</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="CaseForm.view">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="NotificationForm.list">
+        </form>
+        <form name="NotificationForm.read">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="ReportForm">
+        </form>
+        <form name="ReportForm.csv">
+        </form>
+        <form name="ReportForm.page">
+        </form>
+        <form name="UploadForm.download">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="UploadForm.upload">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="UserForm.create">
+            <field property="username" depends="required,maxlength,mask">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <msg name="mask" key="validation.username" />
+                <arg key="field.username" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.USERNAME</var-value>
+                </var>
+                <var>
+                    <var-name>mask</var-name>
+                    <var-value>limit.USERNAME_INPUT_PATTERN</var-value>
+                </var>
+            </field>
+            <field property="password" depends="required,minlength">
+                <msg name="required" key="validation.password" />
+                <msg name="minlength" key="validation.password" />
+                <arg key="field.password" position="0" resource="true" />
+                <var>
+                    <var-name>minlength</var-name>
+                    <var-value>limit.PASSWORD_MIN</var-value>
+                </var>
+            </field>
+            <field property="name" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.name" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.DISPLAY_NAME</var-value>
+                </var>
+            </field>
+            <field property="department" depends="required,maxlength">
+                <msg name="required" key="validation.required" />
+                <msg name="maxlength" key="validation.maximum" />
+                <arg key="field.department" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.DEPARTMENT</var-value>
+                </var>
+            </field>
+            <field property="role" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.role" position="0" resource="true" />
+            </field>
+            <field property="email" depends="maxlength,email">
+                <msg name="maxlength" key="validation.maximum" />
+                <msg name="email" key="validation.email" />
+                <arg key="field.email" position="0" resource="true" />
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false" />
+                <var>
+                    <var-name>maxlength</var-name>
+                    <var-value>limit.EMAIL</var-value>
+                </var>
+            </field>
+        </form>
+        <form name="UserForm.disable">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+        </form>
+        <form name="UserForm.list">
+        </form>
+        <form name="UserForm.role">
+            <field property="id" depends="required">
+                <msg name="required" key="validation.record" />
+            </field>
+            <field property="role" depends="required">
+                <msg name="required" key="validation.required" />
+                <arg key="field.role" position="0" resource="true" />
+            </field>
+        </form>
+    </formset>
+</form-validation>

@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping package="com.example.legacy.model">
- <class name="CaseNotice" table="case_notices" lazy="false">
-  <id name="id" type="long" column="id"><generator class="sequence"><param name="sequence">case_notices_id_seq</param></generator></id>
-  <property name="recipient" column="recipient" type="string"/>
-  <property name="subject" column="subject" type="string"/>
-  <property name="message" column="message" type="string"/>
-  <property name="caseId" column="case_id" type="long"/>
-  <property name="read" column="is_read" type="boolean"/>
-  <property name="sentAt" column="sent_at" type="timestamp"/>
-  <property name="createdAt" column="created_at" type="timestamp"/>
- </class>
+    <class name="CaseNotice" table="case_notices" lazy="false">
+        <id name="id" type="long" column="id">
+            <generator class="sequence">
+                <param name="sequence">case_notices_id_seq</param>
+            </generator>
+        </id>
+        <property name="recipient" type="string" column="recipient" not-null="true" length="60"/>
+        <property name="subject" type="string" column="subject" not-null="true" length="180"/>
+        <property name="message" type="string" column="message" not-null="true" length="4000"/>
+        <property name="caseId" type="long" column="case_id" not-null="false"/>
+        <property name="read" type="boolean">
+            <column name="is_read" not-null="true" default="FALSE"/>
+        </property>
+        <property name="sentAt" type="timestamp" column="sent_at" not-null="false"/>
+        <property name="createdAt" type="timestamp">
+            <column name="created_at" not-null="true" default="now()"/>
+        </property>
+    </class>
+
+    <query name="CaseNotice.findByRecipient"><![CDATA[
+        from CaseNotice where recipient=:user
+        order by createdAt desc
+    ]]></query>
+
+    <query name="CaseNotice.findPendingEmailIds"><![CDATA[
+        select id from CaseNotice where sentAt is null
+        order by createdAt
+    ]]></query>
 </hibernate-mapping>

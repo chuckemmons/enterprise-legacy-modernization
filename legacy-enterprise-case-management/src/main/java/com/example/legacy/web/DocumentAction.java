@@ -1,51 +1,104 @@
 package com.example.legacy.web;
-import com.example.legacy.db.Database;
-import com.example.legacy.dao.CaseDocumentDao;
-import com.example.legacy.model.*;
-import com.example.legacy.service.Services;
-import com.example.legacy.util.Strings;
-import org.apache.struts.action.*;
+
+import com.example.legacy.service.DocumentService;
+import com.example.legacy.service.dto.DocumentDto;
+import com.example.legacy.service.dto.DocumentPageDto;
+import com.example.legacy.service.dto.UploadDocumentDto;
+import com.example.legacy.service.exception.BusinessValidationException;
+import com.example.legacy.service.exception.ConcurrentUpdateException;
+import com.example.legacy.util.ContentTypes;
+import com.example.legacy.util.MessageKeys;
+import com.example.legacy.util.StringsUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.hibernate.Session;
-import javax.servlet.http.*;
-import java.io.*;
-import java.security.MessageDigest;
-import java.util.*;
+
+/**
+ * Handles multipart and download HTTP transport using document form DTOs.
+ *
+ * @author Chuck Emmons
+ */
 public final class DocumentAction extends Action {
- private static final int LIMIT=2*1024*1024;
- @Override public ActionForward execute(ActionMapping m,ActionForm form,HttpServletRequest r,HttpServletResponse resp) {
-   try {
-     final String actor=Web.actor(r);
-     if("upload".equals(m.getParameter())) {
-       UploadForm uf=(UploadForm)form;
-       if(uf==null || uf.getCsrf()==null || !MessageDigest.isEqual(uf.getCsrf().getBytes("UTF-8"),r.getSession().getAttribute("csrf").toString().getBytes("UTF-8")))
-         throw new SecurityException("Invalid upload token");
-       final long caseId=Long.parseLong(uf.getId());
-       FormFile file=uf.getFile();if(file==null || file.getFileSize()==0 || file.getFileSize()>LIMIT)throw new IllegalArgumentException("File must be 1 byte to 2 MB");
-       final String name=Strings.filename(file.getFileName());
-       final String contentType=file.getContentType()==null?"application/octet-stream":file.getContentType();
-       if(!Arrays.asList("application/pdf","image/jpeg","image/png","text/plain","application/octet-stream").contains(contentType))
-         throw new IllegalArgumentException("Unsupported file type");
-       final byte[] bytes=file.getFileData();if(bytes.length>LIMIT)throw new IllegalArgumentException("File too large");
-       Database.tx(new Database.Work<Void>() {public Void run(Session s) {
-         Account a=Services.requireActive(s,actor);Services.worker(a);
-         ServiceCase c=Services.caseById(s,caseId);
-         if("CLOSED".equals(c.getStatus()))throw new IllegalArgumentException("Closed case");
-         if("WORKER".equals(a.getRole())&&!actor.equals(c.getAssignedTo())&&!actor.equals(c.getCreatedBy()))throw new SecurityException("Not your case");
-         CaseDocument d=new CaseDocument();d.setCaseId(caseId);d.setOriginalName(name);d.setContentType(contentType);
-         d.setContentSize(bytes.length);d.setPayload(bytes);d.setUploadedBy(actor);d.setCreatedAt(new Date());new CaseDocumentDao(s).save(d);
-         Services.writeAudit(s,"CASE",caseId,"UPLOAD",actor,"Uploaded " + name);return null;
-       }});
-       file.destroy();return Web.go(r,"/caseView.do?id="+caseId,"Document uploaded");
-     }
-     final long documentId=Web.id(r);
-     CaseDocument d=Database.tx(new Database.Work<CaseDocument>() {public CaseDocument run(Session s) {
-       Services.requireActive(s,actor);CaseDocument doc=new CaseDocumentDao(s).id(documentId);
-       if(doc==null)throw new IllegalArgumentException("Document not found");Services.caseById(s,doc.getCaseId());return doc;
-     }});
-     resp.setContentType("application/octet-stream");resp.setContentLength(d.getContentSize());
-     resp.setHeader("Content-Disposition","attachment; filename=\""+Strings.filename(d.getOriginalName())+"\"");
-     resp.setHeader("X-Content-Type-Options","nosniff");resp.getOutputStream().write(d.getPayload());return null;
-   }catch(Exception e){return Web.fail(r,e);}
- }
+  private final DocumentService documentService;
+
+  /** Creates this action and its reusable service collaborators. */
+  public DocumentAction() {
+    this(new DocumentService());
+  }
+
+  /**
+   * Accepts explicitly supplied application collaborators for request-processing tests.
+   *
+   * @param documentService the document service collaborator
+   * @throws NullPointerException if {@code documentService} is {@code null}
+   */
+  public DocumentAction(DocumentService documentService) {
+    this.documentService = java.util.Objects.requireNonNull(documentService, "documentService");
+  }
+
+  /**
+   * Converts the upload/download form to a DTO and delegates business validation and persistence to
+   * services.
+   *
+   * @param mapping the Struts mapping for the current operation
+   * @param form the form containing the submitted values
+   * @param request the current HTTP request
+   * @param response the HTTP response to populate
+   * @return the next page forward or redirect, or {@code null} when the response is written
+   *     directly
+   * @throws IllegalArgumentException if a message pattern or formatting argument is invalid
+   * @throws NullPointerException if {@code mapping} or {@code request} is {@code null}
+   * @throws java.util.MissingResourceException if a required message bundle or message key cannot
+   *     be found
+   */
+  @Override
+  public ActionForward execute(
+      ActionMapping mapping,
+      ActionForm form,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    UploadForm uploadForm = (UploadForm) form;
+    FormFile file = uploadForm.getFile();
+    try {
+      String actor = WebUtil.getAuthenticatedUsername(request);
+      if (ActionOperation.UPLOAD.matchesParameter(mapping.getParameter())) {
+        WebUtil.validateCsrfToken(
+            uploadForm.getCsrf(), request.getSession().getAttribute(WebKeys.CSRF));
+        UploadDocumentDto data = uploadForm.getUploadData();
+        documentService.uploadDocument(actor, data);
+        return WebUtil.createRedirect(
+            request,
+            Routes.CASE_VIEW + "?id=" + data.getCaseId(),
+            MessageKeys.CONFIRMATION_DOCUMENT_UPLOADED);
+      }
+      uploadForm.setData(
+          DocumentPageDto.builder()
+              .document(documentService.downloadDocument(actor, uploadForm.getRecordData()))
+              .build());
+      DocumentDto document = uploadForm.getDocument();
+      response.setContentType(ContentTypes.BINARY);
+      response.setContentLength(document.getContentSize());
+      response.setHeader(
+          HttpConstants.CONTENT_DISPOSITION,
+          "attachment; filename=\""
+              + StringsUtil.sanitizeFilename(document.getOriginalName())
+              + "\"");
+      response.setHeader(HttpConstants.CONTENT_TYPE_OPTIONS, HttpConstants.NO_SNIFF);
+      response.getOutputStream().write(document.getPayload());
+      return null;
+    } catch (BusinessValidationException | ConcurrentUpdateException exception) {
+      WebUtil.addBusinessError(request, exception);
+      return new ActionForward(mapping.getInput());
+    } catch (Exception exception) {
+      return WebUtil.createFailureForward(request, exception);
+    } finally {
+      if (file != null) {
+        file.destroy();
+      }
+    }
+  }
 }
