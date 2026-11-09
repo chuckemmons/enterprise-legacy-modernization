@@ -14,6 +14,8 @@
     <properties>
         <chrome.version>157.0.8103.38</chrome.version>
         <chrome.noSandbox>false</chrome.noSandbox>
+        <!-- This module runs browser integration tests through Failsafe, without unit tests. -->
+        <sonar.junit.reportPaths>${project.build.directory}/failsafe-reports</sonar.junit.reportPaths>
     </properties>
 
     <dependencies>

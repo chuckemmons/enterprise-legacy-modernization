@@ -1,5 +1,8 @@
 # Enterprise legacy modernization
 
+Project-wide goals live in the [modernization backlog](docs/MODERNIZATION_BACKLOG.md).
+Architecture decision records belong in [docs/adr/](docs/adr/).
+
 ## Build
 
 Use a **JDK 8** `JAVA_HOME` for building, testing, and running this legacy application.
@@ -32,6 +35,8 @@ both deployment artifacts. Production library versions match the previous build.
 | `.\mvnw.cmd test` | Unit tests only |
 | `.\mvnw.cmd verify` | Unit and H2/framework integration tests, WAR and EAR |
 | `.\mvnw.cmd -Pfunctional verify` | Also stage the WAR and run Selenium with portable Chrome |
+| `.\mvnw.cmd -Pcharacterization verify` | Also run the MOD-001 behavioral contract suite; see [characterization tests](characterization-tests/README.md) |
+| `.\mvnw.cmd -Pcharacterization,characterization-postgresql verify` | Run MOD-001 against PostgreSQL using `IT_DB_*` settings |
 | `.\mvnw.cmd -Ppostgresql verify` | Also run PostgreSQL tests; requires `IT_DB_URL`, `IT_DB_USER`, optional `IT_DB_PASSWORD` |
 | `.\mvnw.cmd -DskipTests package` | Build deployment artifacts without running tests |
 
@@ -75,6 +80,7 @@ environment variables as described in the [application guide](legacy-enterprise-
 Import the root `pom.xml` as a Maven project (or choose **Add as Maven Project**),
 then reload Maven projects. Select JDK 8 or JDK 21 for the Maven runner and importer.
 Enable the `functional` Maven profile to import the optional Selenium module.
+Enable the `characterization` profile to import the optional MOD-001 module.
 Maven import regenerates module definitions and dependencies; the obsolete
 `main`/`test` module definitions and Ivy library directories have been removed.
 After pulling this cleanup into an open IDE, reload Maven projects (or reopen the
@@ -167,21 +173,51 @@ token, then run from the repository root:
 
 The profile pins SonarScanner for Maven to 5.8.0.7211 and binds analysis to
 `install`. The scanner defers analysis until the last reactor module, after the
-tests and JaCoCo checks have passed. A plain `clean install` does not scan, and
+tests and JaCoCo checks have passed. It includes all four modules:
+
+- `legacy-enterprise-case-management` (application sources and tests)
+- `legacy-enterprise-case-management-ear` (deployment packaging)
+- `characterization-tests` (behavioral contract runner and tests)
+- `functional-tests` (Selenium tests and `src/fixture/java` test fixtures)
+
+The `sonar` profile includes the two test modules automatically; adding
+`-Pcharacterization,functional` is unnecessary. This also runs their integration
+tests, including the portable Chrome setup described in
+[functional tests](functional-tests/README.md). Run from the root without `-pl`
+to analyze the entire project. A plain `clean install` does not scan, and
 `verify -Psonar` stops before the scan. Avoid parallel Maven builds (`-T`) with
 this profile.
+
+In IntelliJ, open the root `pom.xml`, select **sonar** in the Maven tool window's
+**Profiles** list (already enabled in the shared project settings), and select
+**Reload All Maven Projects**. All four modules should appear under the root.
+Run the root Maven project's `clean install` goals with that profile to scan the
+same reactor as the command above. Individual module builds analyze only their
+selected reactor.
 
 Defaults are `http://localhost:9000` and project key
 `legacy-enterprise-case-management`. Override them with `-Dsonar.host.url=...`
 and `-Dsonar.projectKey=...`. To analyze against Java 8's standard library, add
 `"-Dsonar.java.jdkHome=C:\path\to\jdk8"`. Do not commit tokens.
 
-If you need to compile and test on JDK 8, first run `.\mvnw.cmd clean install`
+If you need to compile and test on JDK 8, first run
+`.\mvnw.cmd -Pcharacterization,functional clean install`
 on JDK 8, then switch `JAVA_HOME` to JDK 21 and run
-`.\mvnw.cmd -Psonar sonar:sonar "-Dsonar.java.jdkHome=C:\path\to\jdk8"`.
+`.\mvnw.cmd -Psonar test-compile sonar:sonar "-Dsonar.java.jdkHome=C:\path\to\jdk8"`.
+The `test-compile` phase registers the functional module's additional fixture
+source root before scanning.
 
 Maven supplies source, bytecode, and dependency paths, so a separate SonarScanner
 CLI installation and hand-written `sonar.java.binaries` setting are unnecessary.
+The profile enables `sonar.maven.scanAll` to include non-Java files such as web
+assets, SQL, and configuration alongside Maven's production and test source
+roots. Do not override `sonar.sources` or `sonar.tests`: doing so disables
+`scanAll` and can omit fixture sources. Generated `target` and `out` directories,
+IntelliJ metadata, scanner output, and the downloaded browser cache are excluded.
+Analysis of each file type depends on the analyzers installed on the SonarQube
+server. Both Surefire and Failsafe test reports are supplied per module. See the
+[SonarScanner for Maven documentation](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/scanners/sonarscanner-for-maven).
+
 The `install` build generates JaCoCo coverage from the unit and application
 integration tests. Sonar imports
 `legacy-enterprise-case-management/target/site/jacoco/jacoco.xml` automatically;
