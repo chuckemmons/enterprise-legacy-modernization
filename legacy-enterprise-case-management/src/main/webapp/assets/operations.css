@@ -1,0 +1,7 @@
+body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; color: #172b3a; background: #f6f8fa; }
+main { max-width: 1600px; margin: auto; }
+table { width: 100%; border-collapse: collapse; background: white; margin: 1rem 0; }
+th, td { text-align: left; padding: .6rem; border-bottom: 1px solid #d7dee4; overflow-wrap: anywhere; }
+th { background: #e8eef3; }
+input, button { font: inherit; padding: .4rem; }
+a { color: #145c98; }
