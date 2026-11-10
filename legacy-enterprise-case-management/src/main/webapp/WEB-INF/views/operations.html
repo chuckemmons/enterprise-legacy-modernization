@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Migration operations</title>
+  <link rel="stylesheet" href="assets/operations.css">
+  <script defer src="assets/operations.js"></script>
+</head>
+<body>
+<main>
+  <h1>Migration operations</h1>
+  <p>Compare implementations and follow a request from HTTP completion through database work.</p>
+  <p>Latest 1,000 events per process; cumulative metrics reset on redeployment. Export snapshots to retain evidence.</p>
+  <nav><a href="operations.do?view=events" download="legacy-events.json">Export events</a> ·
+    <a href="operations.do?view=metrics">Duration metrics</a> · <a href="health/ready">Database readiness</a></nav>
+  <p><button id="refresh" type="button">Refresh</button>
+    <label>Compare exported snapshot <input id="import" type="file" accept=".json,application/json"></label></p>
+  <p id="notice" role="status" aria-live="polite">Loading…</p>
+  <h2>Request summary</h2>
+  <table><thead><tr><th>Implementation</th><th>Requests in snapshot</th><th>Errors</th><th>p50 (ms)</th><th>p95 (ms)</th></tr></thead><tbody id="summary"></tbody></table>
+  <h2>Request lookup</h2>
+  <label>Request ID <input id="request-id" type="search" placeholder="Exact request ID"></label>
+  <table><thead><tr><th>Time</th><th>Request ID</th><th>Implementation / version</th><th>Operation</th><th>Event</th><th>Status / outcome</th><th>Duration (ms)</th></tr></thead><tbody id="events"></tbody></table>
+</main>
+</body></html>
