@@ -1,8 +1,7 @@
 package com.example.legacy.web;
 
+import com.example.legacy.observability.Telemetry;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author Chuck Emmons
  */
 public final class RequestLoggingUtil {
-  private static final Logger LOG = Logger.getLogger(RequestLoggingUtil.class.getName());
 
   /** Prevents instantiation of this shared request logging helper. */
   private RequestLoggingUtil() {}
@@ -33,7 +31,7 @@ public final class RequestLoggingUtil {
   }
 
   /**
-   * Logs an unexpected failure once, preserving the full cause and safe request context.
+   * Logs an unexpected failure once, omitting exception messages and submitted data.
    *
    * @param request the current HTTP request
    * @param failure the failure to report
@@ -44,11 +42,6 @@ public final class RequestLoggingUtil {
       return;
     }
     request.setAttribute(WebKeys.ERROR_LOGGED, Boolean.TRUE);
-    String path = String.valueOf(request.getServletPath()).replace('\r', '_').replace('\n', '_');
-    Object record = request.getAttribute(WebKeys.RECORD_ID);
-    LOG.log(
-        Level.SEVERE,
-        "requestId=" + getOrCreateRequestId(request) + " operation=" + path + " recordId=" + record,
-        failure);
+    Telemetry.failure(failure);
   }
 }

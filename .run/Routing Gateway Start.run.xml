@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Routing Gateway Start" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="goals">
+            <list>
+              <option value="-Prouting-intellij" />
+              <option value="-DskipTests" />
+              <option value="package" />
+            </list>
+          </option>
+          <option name="multimoduleDir" value="$PROJECT_DIR$" />
+          <option name="pomFileName" value="pom.xml" />
+          <option name="profiles"><set /></option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/routing-gateway" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>

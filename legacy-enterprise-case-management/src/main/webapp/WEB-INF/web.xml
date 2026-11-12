@@ -9,6 +9,8 @@
     <filter>
         <filter-name>RequestLoggingFilter</filter-name>
         <filter-class>com.example.legacy.web.RequestLoggingFilter</filter-class>
+        <!-- Enable only behind a proxy that overwrites X-Request-ID and blocks direct access. -->
+        <init-param><param-name>trustRequestId</param-name><param-value>false</param-value></init-param>
     </filter>
     <filter>
         <filter-name>SecurityFilter</filter-name>
@@ -26,6 +28,22 @@
     <listener>
         <listener-class>com.example.legacy.web.ApplicationListener</listener-class>
     </listener>
+    <servlet>
+        <servlet-name>operations</servlet-name>
+        <servlet-class>com.example.legacy.web.OperationsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>operations</servlet-name>
+        <url-pattern>/operations.do</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>health</servlet-name>
+        <servlet-class>com.example.legacy.web.HealthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>health</servlet-name>
+        <url-pattern>/health/*</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>action</servlet-name>
         <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>

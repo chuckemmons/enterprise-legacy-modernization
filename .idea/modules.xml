@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/enterprise-legacy-modernization.iml" filepath="$PROJECT_DIR$/.idea/enterprise-legacy-modernization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/functional-tests/functional-tests.iml" filepath="$PROJECT_DIR$/functional-tests/functional-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/legacy-enterprise-case-management/legacy-enterprise-case-management.iml" filepath="$PROJECT_DIR$/legacy-enterprise-case-management/legacy-enterprise-case-management.iml" />
     </modules>
   </component>

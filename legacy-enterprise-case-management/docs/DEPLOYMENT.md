@@ -13,7 +13,7 @@ The web application resolves `java:comp/env/jdbc/LegacyCases` when its first dat
 
 The template configures a bounded DBCP DataSource, connection validation, and a finite borrow timeout. Tomcat owns this pool and its shutdown; undeployment closes only the application's SessionFactory. Avoid setting `DB_URL` in the Tomcat process when using JNDI, because an explicit JDBC override selects standalone mode.
 
-Operational failure records use JUL and inherit the container's logging configuration. Categories are `com.example.legacy.web.RequestLoggingUtil` and `com.example.legacy.service.BatchJobService`. Unexpected request failures include the response's `X-Request-ID`, operation, record ID, and cause. Expected validation/access/not-found/concurrency messages remain presentation concerns. Persisted audit events record business actions separately.
+Operational records use the JUL category `com.example.legacy.observability.Telemetry`. Request completions and transaction durations share `X-Request-ID` and identify the actual legacy implementation. Exception messages and causes are excluded. Administrators can use `operations.do` for request lookup and exports; `health/live` and `health/ready` provide minimal monitoring probes. See [MOD-002 operations](../../docs/MOD-002-OPERATIONS.md) for collection, security, retention and comparison setup. Persisted audit events remain separate.
 
 ## Standalone CLI operation
 

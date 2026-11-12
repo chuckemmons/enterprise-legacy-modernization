@@ -11,7 +11,7 @@
 
 <p><a href="${pageContext.request.contextPath}${viewOptions.routes.CASES}"><bean:message key="ui.case.list"/></a></p>
 
-<div class="between d-flex flex-wrap align-items-center justify-content-between gap-3">
+<div class="between d-flex flex-wrap align-items-sm-center justify-content-between gap-3">
     <h1><c:out value="${caseForm.item.caseNumber}"/> — <c:out value="${caseForm.item.title}"/></h1>
     <span class="pill badge rounded-pill text-bg-secondary"><c:out value="${caseForm.item.status}"/></span>
 </div>

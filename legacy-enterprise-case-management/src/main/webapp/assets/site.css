@@ -47,13 +47,13 @@ footer { color: #4d6175; font-size: .875rem; }
 @media (max-width: 575.98px) {
     .card-body { padding: 1rem; }
     .container { padding-left: 1rem; padding-right: 1rem; }
-    .between { align-items: flex-start !important; }
+    .between { align-items: flex-start; }
     .table-responsive .table { min-width: 36rem; }
     .filters > label, .filters > .btn { flex-basis: 100%; }
     .pagination { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    html:root, html:root *, html:root *::before, html:root *::after { scroll-behavior: auto; transition: none; animation: none; }
 }
 
 /* Expose navigation when scripting is unavailable. */

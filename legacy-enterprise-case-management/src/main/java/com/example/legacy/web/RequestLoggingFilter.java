@@ -1,5 +1,6 @@
 package com.example.legacy.web;
 
+import com.example.legacy.observability.Telemetry;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,13 +17,17 @@ import javax.servlet.http.HttpServletResponse;
  * @author Chuck Emmons
  */
 public final class RequestLoggingFilter implements Filter {
+  private boolean trustRequestId;
+
   /**
    * Uses application logger configuration without starting background resources.
    *
    * @param config the servlet filter configuration
    */
   @Override
-  public void init(FilterConfig config) {}
+  public void init(FilterConfig config) {
+    trustRequestId = "true".equals(config.getInitParameter("trustRequestId"));
+  }
 
   /**
    * Adds a correlation header and logs uncaught failures at the HTTP boundary.
@@ -31,22 +36,39 @@ public final class RequestLoggingFilter implements Filter {
    * @param output the outgoing servlet response
    * @param chain the remaining servlet filter chain
    * @throws IOException if an I/O operation fails
-   * @throws ServletException if servlet initialization or request processing fails
-   * @throws Error if the downstream filter or servlet raises an error
-   * @throws RuntimeException if the downstream filter or servlet fails while handling the request
+   * @throws ServletException with a safe message if downstream request processing fails
    */
   @Override
   public void doFilter(ServletRequest input, ServletResponse output, FilterChain chain)
       throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) input;
-    ((HttpServletResponse) output)
-        .setHeader(
-            HttpConstants.REQUEST_ID_HEADER, RequestLoggingUtil.getOrCreateRequestId(request));
+    HttpServletResponse response = (HttpServletResponse) output;
+    String incoming = request.getHeader(HttpConstants.REQUEST_ID_HEADER);
+    if (trustRequestId && Telemetry.validId(incoming)) {
+      request.setAttribute(WebKeys.REQUEST_ID, incoming);
+    }
+    String requestId = RequestLoggingUtil.getOrCreateRequestId(request);
+    response.setHeader(HttpConstants.REQUEST_ID_HEADER, requestId);
+    response.setHeader("X-Implementation", "legacy");
+    Telemetry.begin(requestId, request.getServletPath());
+    long start = System.nanoTime();
+    boolean failed = false;
     try {
       chain.doFilter(input, output);
     } catch (IOException | ServletException | RuntimeException | Error failure) {
+      failed = true;
       RequestLoggingUtil.logUnexpectedFailure(request, failure);
-      throw failure;
+      // Container exception logging must not receive credential-bearing messages or causes.
+      throw new ServletException("Unexpected request failure; requestId=" + requestId);
+    } finally {
+      try {
+        Telemetry.request(
+            start,
+            failed ? 500 : response.getStatus(),
+            failed || Boolean.TRUE.equals(request.getAttribute(WebKeys.ERROR_LOGGED)));
+      } finally {
+        Telemetry.end();
+      }
     }
   }
 

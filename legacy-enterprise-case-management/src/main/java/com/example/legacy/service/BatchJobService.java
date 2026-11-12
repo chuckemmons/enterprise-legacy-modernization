@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -36,7 +34,6 @@ public class BatchJobService {
   private static final String SMTP_TLS_PROPERTY = "mail.smtp.starttls.enable";
   private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
   private static final String DEFAULT_SMTP_PORT = "25";
-  private static final Logger LOG = Logger.getLogger(BatchJobService.class.getName());
 
   private final HibernateTransactionTemplate transactionTemplate;
   private final CaseDao caseDao;
@@ -109,25 +106,26 @@ public class BatchJobService {
    */
   @SuppressWarnings("unchecked")
   public void createOverdueNotifications() {
-    transactionTemplate.executeWithoutResult(session -> {
-      List<ServiceCase> cases = caseDao.findOverdueCasesAwaitingNotification(session);
-      for (ServiceCase serviceCase : cases) {
-        String username =
-            serviceCase.getAssignedTo() == null
-                ? serviceCase.getCreatedBy()
-                : serviceCase.getAssignedTo();
+    transactionTemplate.executeWithoutResult(
+        session -> {
+          List<ServiceCase> cases = caseDao.findOverdueCasesAwaitingNotification(session);
+          for (ServiceCase serviceCase : cases) {
+            String username =
+                serviceCase.getAssignedTo() == null
+                    ? serviceCase.getCreatedBy()
+                    : serviceCase.getAssignedTo();
 
-        notificationService.createNotification(
-            session,
-            username,
-            serviceCase.getId(),
-            MessagesUtil.formatMessage(
-                MessageKeys.NOTICE_CASE_OVERDUE, serviceCase.getCaseNumber()),
-            serviceCase.getTitle());
+            notificationService.createNotification(
+                session,
+                username,
+                serviceCase.getId(),
+                MessagesUtil.formatMessage(
+                    MessageKeys.NOTICE_CASE_OVERDUE, serviceCase.getCaseNumber()),
+                serviceCase.getTitle());
 
-        serviceCase.setOverdueNoticeSent(true);
-      }
-    });
+            serviceCase.setOverdueNoticeSent(true);
+          }
+        });
   }
 
   /**
@@ -163,10 +161,7 @@ public class BatchJobService {
         transactionTemplate.executeWithoutResult(
             session -> deliverPendingEmail(session, id, host, senderAddress));
       } catch (RuntimeException failure) {
-        LOG.log(
-            Level.WARNING,
-            MessagesUtil.formatMessage(MessageKeys.AUDIT_NOTIFICATION_DELIVERY_FAILED_WILL_RETRY),
-            failure);
+        com.example.legacy.observability.Telemetry.failure(failure);
       }
     }
   }

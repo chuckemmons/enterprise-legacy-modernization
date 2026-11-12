@@ -67,5 +67,8 @@ public class CharacterizationIntegrationTest {
         .resolve(adapter.getSimpleName());
     ScenarioRunner.run(scenario, fixture, ScenarioRunner.load("/baselines/" + scenario + ".properties"),
         adapter.getDeclaredConstructor().newInstance(), reports);
+    org.junit.Assert.assertEquals("Scenario report must contain no differences", "",
+        new String(Files.readAllBytes(reports.resolve(scenario + "-diff.txt")),
+            java.nio.charset.StandardCharsets.UTF_8));
   }
 }
