@@ -1,6 +1,7 @@
 package com.example.legacy.service.transaction;
 
 import com.example.legacy.db.DatabaseUtil;
+import com.example.legacy.observability.Telemetry;
 import com.example.legacy.service.exception.ConcurrentUpdateException;
 import com.example.legacy.util.MessageKeys;
 import java.util.Objects;
@@ -49,6 +50,28 @@ public class HibernateTransactionTemplate {
    */
   public <T> T execute(Work<T> work) {
     Objects.requireNonNull(work, "work");
+    long start = System.nanoTime();
+    boolean completed = false;
+    try {
+      T result = executeWork(work);
+      completed = true;
+      return result;
+    } finally {
+      Telemetry.transaction(start, completed);
+    }
+  }
+
+  /**
+   * Owns session acquisition, callback execution, commit, rollback and session cleanup.
+   *
+   * @param <T> the callback result type
+   * @param work the callback to execute with the template-owned session
+   * @return the callback result after commit and cleanup complete
+   * @throws ConcurrentUpdateException if Hibernate reports stale state during work or commit
+   * @throws RuntimeException if session acquisition, work or transaction cleanup fails
+   * @throws Error if the callback or Hibernate lifecycle raises an error
+   */
+  private <T> T executeWork(Work<T> work) {
     Session session =
         (sessionFactory == null ? DatabaseUtil.getSessionFactory() : sessionFactory).openSession();
     Transaction transaction = null;
@@ -87,10 +110,11 @@ public class HibernateTransactionTemplate {
    */
   public void executeWithoutResult(Action action) {
     Objects.requireNonNull(action, "action");
-    execute(session -> {
-      action.execute(session);
-      return null;
-    });
+    execute(
+        session -> {
+          action.execute(session);
+          return null;
+        });
   }
 
   /**

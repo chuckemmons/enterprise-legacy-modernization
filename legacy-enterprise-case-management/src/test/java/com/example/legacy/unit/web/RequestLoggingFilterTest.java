@@ -2,7 +2,6 @@ package com.example.legacy.unit.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -10,6 +9,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.example.legacy.observability.Telemetry;
 import com.example.legacy.service.exception.BusinessValidationException;
 import com.example.legacy.support.ServletTestSupport;
 import com.example.legacy.util.MessageKeys;
@@ -43,7 +43,7 @@ import org.mockito.ArgumentCaptor;
  * @author Chuck Emmons
  */
 public class RequestLoggingFilterTest {
-  private final Logger logger = Logger.getLogger(RequestLoggingUtil.class.getName());
+  private final Logger logger = Logger.getLogger(Telemetry.class.getName());
   private final List<LogRecord> records = new ArrayList<>();
   private Handler capture;
   private boolean parent;
@@ -102,11 +102,12 @@ public class RequestLoggingFilterTest {
     UUID.fromString(id.getValue());
     assertEquals(RequestLoggingUtil.getOrCreateRequestId(request), id.getValue());
     verify(chain).doFilter(request, response);
-    assertTrue(records.isEmpty());
+    assertEquals(1, records.size());
+    assertTrue(records.get(0).getMessage().contains("\"event\":\"request\""));
   }
 
   /**
-   * Logs unhandled failures once with the original cause and bounded request context.
+   * Logs unhandled failure types once and prevents container logging of unsafe causes.
    *
    * @throws Exception if test setup, execution, or cleanup fails
    * @throws AssertionError if an asserted result or expected interaction does not match the
@@ -116,18 +117,24 @@ public class RequestLoggingFilterTest {
   public void logsUnhandledFailureOnlyOnce() throws Exception {
     HttpServletResponse response = mock(HttpServletResponse.class);
     FilterChain chain = mock(FilterChain.class);
-    ServletException expected = new ServletException("original failure");
+    ServletException expected = new ServletException("original failure PasswordCanary!2026");
+    expected.addSuppressed(new IllegalStateException("SuppressedPasswordCanary!2026"));
     doThrow(expected).when(chain).doFilter(request, response);
-    assertSame(
-        expected,
+    ServletException propagated =
         assertThrows(
             ServletException.class,
-            () -> new RequestLoggingFilter().doFilter(request, response, chain)));
+            () -> new RequestLoggingFilter().doFilter(request, response, chain));
+    assertEquals(null, propagated.getCause());
+    assertFalse(propagated.getMessage().contains("original failure"));
     RequestLoggingUtil.logUnexpectedFailure(request, expected);
-    assertEquals(1, records.size());
-    assertSame(expected, records.get(0).getThrown());
-    assertTrue(records.get(0).getMessage().contains("operation=/caseCreate.do"));
-    assertTrue(records.get(0).getMessage().contains("recordId=7"));
+    assertEquals(2, records.size());
+    assertEquals(null, records.get(0).getThrown());
+    for (LogRecord record : records) {
+      assertFalse(record.getMessage().contains("PasswordCanary"));
+      assertEquals(null, record.getThrown());
+    }
+    assertTrue(records.get(0).getMessage().contains("\"operation\":\"/caseCreate.do\""));
+    assertTrue(records.get(1).getMessage().contains("\"status\":500"));
   }
 
   /**

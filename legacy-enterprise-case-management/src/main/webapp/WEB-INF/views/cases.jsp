@@ -10,7 +10,7 @@
 <bean:define id="format_date"><bean:message key="format.date"/></bean:define>
 <bean:define id="unassignedLabel"><bean:message key="ui.unassigned"/></bean:define>
 
-<div class="between d-flex flex-wrap align-items-center justify-content-between gap-3">
+<div class="between d-flex flex-wrap align-items-sm-center justify-content-between gap-3">
     <h1><bean:message key="ui.cases"/></h1>
 
     <c:if test="${sessionScope[viewOptions.keys.ROLE] ne viewOptions.roleCodes.AUDITOR}">

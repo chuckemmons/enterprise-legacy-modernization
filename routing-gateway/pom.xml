@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example.legacy</groupId>
+        <artifactId>enterprise-legacy-modernization</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>routing-gateway</artifactId>
+    <name>Routing Gateway</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>routing-gateway</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- Shade replaces this JAR. Always recreate the unbundled input,
+                         including when IntelliJ runs package repeatedly without clean. -->
+                    <forceCreation>true</forceCreation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes><exclude>**/*IntegrationTest.java</exclude></excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions><execution>
+                    <phase>package</phase>
+                    <goals><goal>shade</goal></goals>
+                    <configuration>
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
+                        <filters>
+                            <!-- This is a classpath executable, not a JPMS module. -->
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>module-info.class</exclude>
+                                    <exclude>META-INF/versions/**/module-info.class</exclude>
+                                </excludes>
+                            </filter>
+                            <!-- The executable gets its own manifest below. Keep dependency
+                                 classes, Maven metadata and license resources intact. -->
+                            <filter>
+                                <artifact>com.google.code.gson:gson</artifact>
+                                <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                            </filter>
+                            <filter>
+                                <artifact>com.google.errorprone:error_prone_annotations</artifact>
+                                <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                            </filter>
+                        </filters>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>com.example.routing.Gateway</mainClass>
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </execution></executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>routing-intellij</id>
+            <build><plugins><plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions><execution>
+                    <id>start-intellij-gateway</id>
+                    <phase>package</phase>
+                    <goals><goal>exec</goal></goals>
+                    <configuration>
+                        <executable>powershell.exe</executable>
+                        <arguments>
+                            <argument>-NoProfile</argument>
+                            <argument>-NonInteractive</argument>
+                            <argument>-ExecutionPolicy</argument>
+                            <argument>Bypass</argument>
+                            <argument>-File</argument>
+                            <argument>${project.basedir}/../scripts/Start-RoutingGateway.ps1</argument>
+                            <argument>-JavaHome</argument>
+                            <argument>${java.home}</argument>
+                        </arguments>
+                    </configuration>
+                </execution></executions>
+            </plugin></plugins></build>
+        </profile>
+        <profile>
+            <id>routing-integration</id>
+            <build><plugins><plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes><include>**/*IntegrationTest.java</include></includes>
+                    <systemPropertyVariables>
+                        <routing.nginx>${routing.nginx}</routing.nginx>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions><execution><goals>
+                    <goal>integration-test</goal><goal>verify</goal>
+                </goals></execution></executions>
+            </plugin></plugins></build>
+        </profile>
+    </profiles>
+</project>

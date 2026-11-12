@@ -1,0 +1,11 @@
+{
+  "listen": "127.0.0.1:8088",
+  "context": "/cases",
+  "legacy": "127.0.0.1:8080",
+  "replacement": "127.0.0.1:8081",
+  "replacement_ready": false,
+  "capabilities": {
+    "case-search": "legacy",
+    "case-details": "legacy"
+  }
+}

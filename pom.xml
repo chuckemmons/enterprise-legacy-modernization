@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>routing-gateway</module>
         <module>legacy-enterprise-case-management</module>
         <module>legacy-enterprise-case-management-ear</module>
     </modules>

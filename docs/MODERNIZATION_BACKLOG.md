@@ -13,7 +13,18 @@ Coverage and validation: [MOD-001 requirements review](../characterization-tests
 
 **MOD-002 — Legacy observability.** As an operator, I want request IDs, transaction duration metrics, structured logs and functional checks so I can compare new and old behavior. Acceptance: dashboard traces each migrated request to its responsible implementation; no passwords logged.
 
+Legacy instrumentation and administrator dashboard: [MOD-002 operations](MOD-002-OPERATIONS.md).
+Design, retention and ownership boundaries: [ADR-0002](adr/0002-legacy-observability.md).
+Cross-runtime routing/rollback acceptance remains pending the replacement and MOD-003;
+complete historical coverage requires deployment log collection.
+
 **MOD-003 — Reversible proxy routing.** As an architect, I want feature-by-feature routing so individual workflows can be transferred to the new application and rolled back without database corruption. Acceptance: route toggles are documented and tested under both versions.
+
+Routing infrastructure and real-proxy transport tests: [routing-gateway](../routing-gateway/README.md).
+Switch/rollback commands and deployment acceptance: [MOD-003 operations](MOD-003-OPERATIONS.md).
+Design and writer ownership boundaries: [ADR-0003](adr/0003-reversible-proxy-routing.md).
+Search/details are independently switchable for GET/HEAD; writes remain legacy.
+Tests use synthetic backends; real replacement parity/session and rollback acceptance remain pending.
 
 ## Phase 1 — Read-only user experience
 

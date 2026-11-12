@@ -3,6 +3,9 @@
 Project-wide goals live in the [modernization backlog](docs/MODERNIZATION_BACKLOG.md).
 Architecture decision records belong in [docs/adr/](docs/adr/).
 
+MOD-003 reverse proxy setup, read-only capability switches and rollback commands are documented
+in [routing-gateway](routing-gateway/README.md) and [operations](docs/MOD-003-OPERATIONS.md).
+
 ## Build
 
 Use a **JDK 8** `JAVA_HOME` for building, testing, and running this legacy application.
@@ -25,6 +28,7 @@ This runs the unit and H2/framework integration tests and produces:
 
 - `legacy-enterprise-case-management/target/legacy-case-management.war`
 - `legacy-enterprise-case-management-ear/target/legacy-case-management.ear`
+- `routing-gateway/target/routing-gateway.jar` (standalone Java routing CLI)
 
 The EAR embeds the WAR with the existing `/cases` context root. Tomcat uses the WAR.
 Servlet/JSP APIs are provided by the container; test libraries are excluded from
@@ -108,6 +112,10 @@ In **Run | Edit Configurations | Tomcat 9**:
    to see updated JSP/CSS/JavaScript. This updates deployment files; it does not
    automatically refresh the browser page.
 
+The local Tomcat 9 configuration also starts Routing Gateway using a Maven Before launch
+task. See [IntelliJ gateway startup](docs/MOD-003-OPERATIONS.md#intellij-tomcat-9-startup-windows)
+for the matching context path, NGINX location, browser URL and explicit stop command.
+
 | Change | Development update |
 | --- | --- |
 | JSPs (including `audit.jsp`), CSS, JavaScript, images | Update resources and refresh the browser; Tomcat recompiles changed JSPs |
@@ -173,9 +181,10 @@ token, then run from the repository root:
 
 The profile pins SonarScanner for Maven to 5.8.0.7211 and binds analysis to
 `install`. The scanner defers analysis until the last reactor module, after the
-tests and JaCoCo checks have passed. It includes all four modules:
+tests and JaCoCo checks have passed. It includes all five modules:
 
 - `legacy-enterprise-case-management` (application sources and tests)
+- `routing-gateway` (Java CLI and routing tests; real NGINX tests require `routing-integration`)
 - `legacy-enterprise-case-management-ear` (deployment packaging)
 - `characterization-tests` (behavioral contract runner and tests)
 - `functional-tests` (Selenium tests and `src/fixture/java` test fixtures)
@@ -190,7 +199,7 @@ this profile.
 
 In IntelliJ, open the root `pom.xml`, select **sonar** in the Maven tool window's
 **Profiles** list (already enabled in the shared project settings), and select
-**Reload All Maven Projects**. All four modules should appear under the root.
+**Reload All Maven Projects**. All five modules should appear under the root.
 Run the root Maven project's `clean install` goals with that profile to scan the
 same reactor as the command above. Individual module builds analyze only their
 selected reactor.

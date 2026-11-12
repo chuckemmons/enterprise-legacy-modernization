@@ -11,7 +11,7 @@
 <section class="panel card card-body">
     <c:forEach var="n" items="${notificationForm.notices}">
         <div class="entry">
-            <div class="between d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="between d-flex flex-wrap align-items-sm-center justify-content-between gap-3">
                 <strong><c:out value="${n.subject}"/></strong>
                 <small><fmt:formatDate value="${n.createdAt}" pattern="${format_datetime}"/></small>
             </div>
